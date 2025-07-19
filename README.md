@@ -2,8 +2,6 @@
 
 **Skanvas** is an AI-powered drawing web app where you can draw with your **index finger** using a webcam and erase with your **open palm** – no hardware or pen needed!
 
-![Skanvas Screenshot](skanvas_sample.png)
-
 ## ✨ Features
 
 - 🎨 Draw using your **index finger**
