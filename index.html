@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>skanvas - Draw with Hands</title>
+  <style>
+    body { margin: 0; background: #111; color: white; font-family: sans-serif; overflow: hidden; }
+    #ui { position: fixed; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 8px; }
+    label, input { margin: 5px 0; display: block; }
+    #title { position: fixed; top: 10px; right: 20px; font-size: 24px; font-weight: bold; z-index: 10; color: #00ffcc; }
+    canvas { position: absolute; top: 0; left: 0; z-index: 1; }
+    video { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; opacity: 0.25; z-index: 0; }
+    button { margin-top: 10px; padding: 5px 10px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    <label>Brush Color: <input type="color" id="color" value="#00ffcc"></label>
+    <label>Brush Size: <input type="range" id="size" min="1" max="30" value="5"></label>
+    <button id="saveBtn">💾 Save Drawing</button>
+  </div>
+
+  <div id="title">Skanvas</div>
+
+  <video id="video" autoplay playsinline muted></video>
+  <canvas id="canvas"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.min.js"></script>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const video = document.getElementById('video');
+    const colorPicker = document.getElementById('color');
+    const sizeSlider = document.getElementById('size');
+    const saveBtn = document.getElementById('saveBtn');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let lastX = null, lastY = null;
+
+    const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+    hands.setOptions({
+      maxNumHands: 1,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.7,
+      minTrackingConfidence: 0.7
+    });
+
+    hands.onResults(results => {
+      ctx.lineWidth = parseInt(sizeSlider.value);
+      ctx.strokeStyle = colorPicker.value;
+
+      if (results.multiHandLandmarks.length > 0) {
+        const landmarks = results.multiHandLandmarks[0];
+        const index = landmarks[8];
+        const thumb = landmarks[4];
+        const pinky = landmarks[20];
+
+        const x = index.x * canvas.width;
+        const y = index.y * canvas.height;
+
+        // Palm open check: if thumb to pinky distance is wide
+        const palmWidth = Math.abs(thumb.x - pinky.x);
+
+        if (palmWidth > 0.35) { // Detect open palm to erase
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          lastX = null;
+        } else {
+          if (lastX !== null) {
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+          }
+          lastX = x;
+          lastY = y;
+        }
+      } else {
+        lastX = null;
+      }
+    });
+
+    const camera = new Camera(video, {
+      onFrame: async () => {
+        await hands.send({image: video});
+      },
+      width: 1280,
+      height: 720
+    });
+    camera.start();
+
+    saveBtn.onclick = () => {
+      const link = document.createElement('a');
+      link.download = 'skanvas_drawing.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    };
+  </script>
+</body>
+</html>
