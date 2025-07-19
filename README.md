@@ -35,7 +35,6 @@ You can deploy your own version in minutes:
 ## 🙌 Credits
 
 - Built using [MediaPipe Hands](https://google.github.io/mediapipe/)
-- Idea by [Your Name]
 
 ---
 
