@@ -2,8 +2,6 @@
 
 **Skanvas** is an AI-powered drawing web app where you can draw with your **index finger** using a webcam and erase with your **open palm** – no hardware or pen needed!
 
-![Skanvas Screenshot](skanvas_sample.png)
-
 ## ✨ Features
 
 - 🎨 Draw with your **index finger**
@@ -22,15 +20,14 @@
 ## 🌍 Deploy on Netlify (Free)
 
 ### Steps:
-1. Go to [https://app.netlify.com](https://app.netlify.com)
+1. Go to [statuesque-beignet-f93cef.netlify.app](statuesque-beignet-f93cef.netlify.app)
 2. Click **\"Add New Site\" > \"Deploy manually\"**
 3. Drag & drop the folder with `index.html` and `skanvas_sample.png`
 4. Netlify will give you a live link like `https://skanvas.netlify.app`
 
 ## 🙌 Credits
 - Built using [MediaPipe Hands](https://google.github.io/mediapipe/)
-- Idea by [Your Name]
 
----
+
 
 > ✨ Feel free to fork or improve. Open to PRs!
